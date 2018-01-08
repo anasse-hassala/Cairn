@@ -1,0 +1,20 @@
+# Rust
+/rust/target/
+**/*.rs.bk
+Cargo.lock
+
+# Go
+/bin/
+*.exe
+*.test
+*.out
+
+# Cairn caches created by demos/tests
+.cairn-cache/
+**/.cairn-cache/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
