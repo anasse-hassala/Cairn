@@ -14,3 +14,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - Standard-library-only implementation, including a small canonical JSON
     reader/writer.
 - **Go wrapper (`cairn-run`)** — cache-aware command execution.
+  - Cache HIT restores declared outputs; MISS runs the command and captures
+    outputs. Failed commands are not cached.
