@@ -18,3 +18,4 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     outputs. Failed commands are not cached.
   - `hash` and `version` helper subcommands.
 - **Shared format v1** — FNV-1a 64-bit content hashing, canonical cache-key
+  stream, and canonical manifest JSON, documented in `docs/FORMAT.md` and
