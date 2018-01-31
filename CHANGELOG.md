@@ -21,3 +21,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   stream, and canonical manifest JSON, documented in `docs/FORMAT.md` and
   reproduced byte-for-byte by both tools.
 - Cross-language reference-vector tests guarding digest and key parity.
+- Demo scripts (`examples/demo.sh`, `examples/demo.ps1`), Makefile, and GitHub
+  Actions CI (Rust, Go, and an interop job running the demo).
