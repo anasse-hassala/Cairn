@@ -78,3 +78,15 @@ restores and verifies it, their keys match byte-for-byte, and the test suites
 carry cross-language reference vectors so any drift fails CI immediately. The
 contract that binds them is [`docs/FORMAT.md`](docs/FORMAT.md) — the normative
 specification. This README is the field guide *to* that contract.
+
+## Field kit — install &amp; build
+
+You need a Rust toolchain (1.70+) and Go (1.21+; the module targets 1.24).
+
+```bash
+make build     # -> rust/target/release/cairn  and  bin/cairn-run
+make test      # cargo test + go test ./...
+make demo      # build everything, then run examples/demo.sh
+make clean     # cargo clean + rm -rf bin .cairn-cache
+```
+
