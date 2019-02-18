@@ -102,3 +102,15 @@ zero-padded 64-bit FNV-1a digest), then wrap a real command. The first run is a
 
 ```console
 $ printf 'greetings from cairn' > input.txt
+$ cairn hash input.txt
+2e94eeb351265c82          20  input.txt
+
+$ cairn-run --verbose --input input.txt --output output.txt -- \
+      sh -c 'tr a-z A-Z < input.txt > output.txt'
+cairn-run: cache MISS 8c165ae10d5fa0a2
+cairn-run: stored manifest 8c165ae10d5fa0a2 (1 output(s))
+
+$ rm output.txt   # then re-run the identical command
+$ cairn-run --verbose --input input.txt --output output.txt -- \
+      sh -c 'tr a-z A-Z < input.txt > output.txt'
+cairn-run: cache HIT 8c165ae10d5fa0a2 (restored 1 output(s))
