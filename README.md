@@ -90,3 +90,15 @@ make demo      # build everything, then run examples/demo.sh
 make clean     # cargo clean + rm -rf bin .cairn-cache
 ```
 
+To build each tool by hand: `cd rust && cargo build --release`, and
+`cd go && go build -o ../bin/cairn-run ./cmd/cairn-run`.
+
+## First descent — quickstart transcripts
+
+Hash a file to see a content address (16 lowercase hex characters — a
+zero-padded 64-bit FNV-1a digest), then wrap a real command. The first run is a
+**cache MISS** (the command runs, its output is captured); the second is a
+**cache HIT** (nothing executes, the output is laid back down):
+
+```console
+$ printf 'greetings from cairn' > input.txt
