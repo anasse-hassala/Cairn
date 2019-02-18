@@ -126,3 +126,15 @@ manifest.
 
 Every wrapped command travels the same three-layer section:
 
+```
+  declared inputs ──FNV-1a──▶ input entries ─┐
+  command line ──────────────────────────────┼─▶ CACHE KEY
+                                              ┘
+        │
+        ▼   manifests/<key>.json exists?
+   no ──┴── yes
+   │         │
+  MISS      HIT ── restore every output blob, skip the command
+  run cmd
+   │
+  STORE ── capture outputs as content-addressed blobs, write manifest
