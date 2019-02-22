@@ -138,3 +138,15 @@ Every wrapped command travels the same three-layer section:
   run cmd
    │
   STORE ── capture outputs as content-addressed blobs, write manifest
+```
+
+Three rules govern the strata:
+
+1. **MISS runs; HIT restores.** A hit never executes your command. If restoring
+   a hit *fails* (say, a pruned blob), the surveyor does not error — it falls
+   through and re-runs, then re-stores. The cache degrades to a miss, never to a
+   broken build.
+2. **STORE is content-addressed.** Outputs are hashed and filed under their own
+   digest, so two steps that produce identical bytes share one blob on disk.
+3. **Failure is never cached.** A non-zero command exit writes no manifest; a
+   red build stays red on the next run.
