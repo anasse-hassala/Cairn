@@ -150,3 +150,16 @@ Three rules govern the strata:
    digest, so two steps that produce identical bytes share one blob on disk.
 3. **Failure is never cached.** A non-zero command exit writes no manifest; a
    red build stays red on the next run.
+
+## Reading the rock — data layout on disk
+
+Relative to the cache root (default `.cairn-cache/`):
+
+```
+.cairn-cache/
+├── objects/
+│   ├── aa/aabb…            content blob — filename IS its digest
+│   └── 85/8594…            sharded by the first two hex chars
+└── manifests/
+    └── <key>.json          one canonical manifest per cache key
+```
