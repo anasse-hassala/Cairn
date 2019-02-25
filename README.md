@@ -187,3 +187,15 @@ NUL-delimited byte stream, assembled in this exact order (`·` marks a `\x00`):
 "cairn-key" ·
 <format-version> ·                 (decimal ASCII, currently "1")
 for each input entry, SORTED ascending by path:
+    <path> · <digest> · <size> ·   (path uses forward slashes on every OS)
+"cmd" ·
+for each command argument, in order:
+    <arg> ·
+```
+
+Three properties fall out of this layout: inputs are **sorted by path** before
+hashing, so `-i b.c -i a.c` equals `-i a.c -i b.c`; **every command argument is
+folded in**, so changing a flag or the command produces a different key and
+unrelated steps never collide; and **paths are normalized to forward slashes**,
+so a manifest written on Windows is a legitimate hit on Linux and vice-versa.
+The format version is part of the stream, so bumping it cleanly invalidates
