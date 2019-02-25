@@ -175,3 +175,15 @@ Relative to the cache root (default `.cairn-cache/`):
   reads its manifest and copies the referenced blobs to their paths.
 
 Manifests are written *canonically* — compact, fixed key order, RFC 8259 string
+escaping — which is what lets two languages produce byte-identical files. Full
+details live in [`docs/FORMAT.md`](docs/FORMAT.md).
+
+## Cache-key anatomy
+
+A cache key identifies one logical build step: the FNV-1a digest of a single
+NUL-delimited byte stream, assembled in this exact order (`·` marks a `\x00`):
+
+```
+"cairn-key" ·
+<format-version> ·                 (decimal ASCII, currently "1")
+for each input entry, SORTED ascending by path:
