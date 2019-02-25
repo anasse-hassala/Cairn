@@ -163,3 +163,15 @@ Relative to the cache root (default `.cairn-cache/`):
 └── manifests/
     └── <key>.json          one canonical manifest per cache key
 ```
+
+- **Blobs are content-addressed and deduplicated.** A blob's path *is* its
+  FNV-1a digest, sharded into a two-hex-character subdirectory. Identical output
+  bytes are written exactly once, however many manifests reference them.
+- **Writes are atomic.** Every blob and manifest is written to a `.tmp` sibling,
+  `fsync`ed, and `rename`d into place, so a crash mid-write cannot leave a
+  half-formed object where a reader might find it.
+- **Manifests are the index bedrock.** A manifest names the command and the
+  sorted input/output entries (`{path, digest, size}` each); restoring a key
+  reads its manifest and copies the referenced blobs to their paths.
+
+Manifests are written *canonically* — compact, fixed key order, RFC 8259 string
