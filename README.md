@@ -211,3 +211,15 @@ full table lives in [`docs/FORMAT.md`](docs/FORMAT.md).
 ### The honest caveat — FNV-1a is not cryptographic
 
 FNV-1a has **no collision resistance and no pre-image resistance** against a
+deliberate adversary. Cairn is a build cache, not a security boundary. It was
+chosen because it is deterministic across platforms and languages,
+dependency-free (a few lines in any language), and fast enough to detect the
+*accidental* change that is a cache's actual job.
+
+Do **not** rely on a Cairn digest to detect malicious tampering. If you need
+that, layer a signed manifest or a cryptographic digest *on top of* Cairn — do
+not substitute it. This limitation is stated identically in `docs/FORMAT.md`,
+in the Rust `hash` module docs, and here, on purpose.
+
+## Rust ↔ Go interop
+
