@@ -199,3 +199,15 @@ folded in**, so changing a flag or the command produces a different key and
 unrelated steps never collide; and **paths are normalized to forward slashes**,
 so a manifest written on Windows is a legitimate hit on Linux and vice-versa.
 The format version is part of the stream, so bumping it cleanly invalidates
+every old key rather than risking a silent misread.
+
+### Reference vectors
+
+Both test suites assert the canonical FNV-1a vectors — `""` →
+`cbf29ce484222325`, `"a"` → `af63dc4c8601ec8c`, `"foobar"` →
+`85944171f73967e8` — so the two implementations can never quietly diverge. The
+full table lives in [`docs/FORMAT.md`](docs/FORMAT.md).
+
+### The honest caveat — FNV-1a is not cryptographic
+
+FNV-1a has **no collision resistance and no pre-image resistance** against a
