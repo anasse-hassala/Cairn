@@ -235,3 +235,15 @@ $ cairn-run --input input.txt --output output.txt -- \
 $ key=$(cairn key --input input.txt -- sh -c 'tr a-z A-Z < input.txt > output.txt')
 
 # restores the Go-written outputs, and verifies the Go-written manifest.
+$ rm output.txt && cairn restore --key "$key" --out-dir .
+restored 1 output(s) for key 8c165ae10d5fa0a2
+$ cairn verify --key "$key"
+key 8c165ae10d5fa0a2: 1 ok, 0 missing, 0 corrupt, key_matches=true
+OK: cache is healthy
+```
+
+The `producer` field records which tool wrote a manifest (`cairn-rust` or
+`cairn-go`) — useful when auditing — but it does not affect the key or the
+bytes. A store is a shared seam; either tool may quarry it.
+
+## Guided walk — the scripted demo
