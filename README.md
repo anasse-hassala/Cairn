@@ -247,3 +247,15 @@ The `producer` field records which tool wrote a manifest (`cairn-rust` or
 bytes. A store is a shared seam; either tool may quarry it.
 
 ## Guided walk — the scripted demo
+
+A scripted end-to-end walk builds both tools and demonstrates
+hash → MISS → HIT → cross-language restore/verify in one pass:
+
+```bash
+./examples/demo.sh            # Linux / macOS
+powershell examples/demo.ps1  # Windows
+```
+
+It runs in a throwaway temp directory, executing the same command twice to show
+a miss then a hit, then hands the manifest to the engine to restore and verify —
+the exact interop path above.
