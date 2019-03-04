@@ -259,3 +259,15 @@ powershell examples/demo.ps1  # Windows
 It runs in a throwaway temp directory, executing the same command twice to show
 a miss then a hit, then hands the manifest to the engine to restore and verify —
 the exact interop path above.
+
+## The performance ledger
+
+<p align="center">
+  <img src="docs/assets/ledger.svg" alt="A terminal showing a cache MISS followed by a HIT, beside a ledger recording the relative shape of the two events" width="760">
+</p>
+
+Cairn ships **no benchmark numbers, and this README invents none.** A cache's
+payoff is entirely a function of *your* workload — how expensive the wrapped
+command is, how large the outputs are, and how often inputs change. A headline
+speedup would be dishonest; the only number that matters is the one you measure.
+To keep an honest ledger:
