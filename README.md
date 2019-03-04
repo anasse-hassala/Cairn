@@ -223,3 +223,15 @@ in the Rust `hash` module docs, and here, on purpose.
 
 ## Rust ↔ Go interop
 
+The two tools are not merely compatible; they are *interchangeable* at the
+format boundary — anything one writes, the other can read, restore, and verify:
+
+```console
+# Go surveyor writes a manifest during a normal wrapped run…
+$ cairn-run --input input.txt --output output.txt -- \
+      sh -c 'tr a-z A-Z < input.txt > output.txt'
+
+# …the Rust engine computes the identical key from the same inputs+command,
+$ key=$(cairn key --input input.txt -- sh -c 'tr a-z A-Z < input.txt > output.txt')
+
+# restores the Go-written outputs, and verifies the Go-written manifest.
