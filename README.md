@@ -271,3 +271,15 @@ payoff is entirely a function of *your* workload — how expensive the wrapped
 command is, how large the outputs are, and how often inputs change. A headline
 speedup would be dishonest; the only number that matters is the one you measure.
 To keep an honest ledger:
+
+1. **Establish the miss cost** — `rm -rf .cairn-cache`, then
+   `time cairn-run --input src.c --output a.o -- cc -c src.c -o a.o`. This is the
+   command's cost plus a small overhead for hashing inputs and storing outputs.
+2. **Measure the hit cost** — run the identical command again under `time`. A
+   hit does no compilation: its cost is hashing declared inputs, one manifest
+   read, and copying output blobs back.
+3. **Compute your own ratio** — miss time over hit time. Cheap command with huge
+   outputs? Unimpressive. Expensive command with small outputs? Dramatic.
+
+What you *can* rely on structurally, without numbers: a hit's cost scales with
+**input hashing + output copy**, not with the original command's complexity;
