@@ -295,3 +295,15 @@ Know the terrain before you descend.
 
 | Hazard | What happens | Why |
 | ------ | ------------ | --- |
+| **Undeclared input changes** | Stale hit: old output restored. | The key sees only inputs you declared. Declare every real input. |
+| **Undeclared output produced** | Not cached; a later hit won't restore it. | Only `--output` files are captured. |
+| **Pruned or corrupted blob** | Surveyor re-runs; `verify` reports `missing`/`corrupt`. | Restore checks presence; verify re-hashes each blob. |
+| **Non-zero command exit** | Nothing cached; exit code propagated. | Failed builds must never masquerade as hits. |
+| **Manifest tampering** | `verify` reports `key_matches=false`. | Verify recomputes the key from the manifest's own inputs+command. |
+| **Hash collision (adversarial)** | Possible — FNV-1a isn't collision-resistant. | See the honest caveat. Not a trust boundary. |
+
+`cairn verify --key <k>` is your integrity probe: it checks that every
+referenced blob exists, that each blob still hashes to its recorded digest, and
+that the manifest's index still recomputes to its stored key. All three must
+hold for the cache to be *healthy* for that key.
+
