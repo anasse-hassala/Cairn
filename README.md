@@ -307,3 +307,16 @@ referenced blob exists, that each blob still hashes to its recorded digest, and
 that the manifest's index still recomputes to its stored key. All three must
 hold for the cache to be *healthy* for that key.
 
+## Known limits of the survey
+
+Stated plainly:
+
+- **You declare inputs and outputs.** Cairn does no dependency discovery — a
+  feature (language-agnostic) and a responsibility (you must be complete).
+- **No eviction / GC yet.** The store grows until you delete it; dedup slows
+  that growth but does not stop it.
+- **No concurrency coordination.** No cross-process lock. Two writers of the
+  *same* key rely on atomic rename for a coherent final file, but Cairn does not
+  orchestrate parallel builds.
+- **Not a scheduler.** One step at a time. Compose Cairn under `make`, a script,
+  or CI — it is a memoizer, not an orchestrator.
