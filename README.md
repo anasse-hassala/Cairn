@@ -320,3 +320,15 @@ Stated plainly:
   orchestrate parallel builds.
 - **Not a scheduler.** One step at a time. Compose Cairn under `make`, a script,
   or CI — it is a memoizer, not an orchestrator.
+- **FNV-1a, not a cryptographic hash.** Repeated a third time because it is the
+  most important boundary in the project.
+
+## Integration recipes
+
+Cairn slots in anywhere you already invoke a command.
+
+**Wrap a Makefile recipe** — prefix the command; declare inputs and outputs:
+
+```makefile
+a.o: src.c
+	cairn-run --input src.c --output a.o -- cc -c src.c -o a.o
