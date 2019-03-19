@@ -332,3 +332,15 @@ Cairn slots in anywhere you already invoke a command.
 ```makefile
 a.o: src.c
 	cairn-run --input src.c --output a.o -- cc -c src.c -o a.o
+```
+
+**Cache a bundler step in CI** — persist `.cairn-cache/` between runs (as a CI
+cache directory) and wrap the expensive command:
+
+```bash
+cairn-run --input src/index.ts --output dist/bundle.js -- \
+    esbuild src/index.ts --bundle --outfile=dist/bundle.js
+```
+
+**Force a rebuild but keep recording** — `--force` always runs the command
+while still writing a fresh manifest, refreshing an entry without deleting the
