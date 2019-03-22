@@ -356,3 +356,15 @@ verify without running anything:
 ```bash
 key=$(cairn key --input src.c -- cc -c src.c -o a.o)
 cairn show   --key "$key"
+cairn verify --key "$key"
+```
+
+## Command reference
+
+### `cairn` — the Rust engine
+
+| Command   | Purpose                                                           |
+| --------- | ----------------------------------------------------------------- |
+| `hash`    | Print content digests (and sizes) of one or more files.           |
+| `key`     | Compute a cache key from `--input` files and an optional `-- cmd`. |
+| `store`   | Store `--output` files and write a manifest for the computed key. |
