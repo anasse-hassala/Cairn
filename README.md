@@ -344,3 +344,15 @@ cairn-run --input src/index.ts --output dist/bundle.js -- \
 
 **Force a rebuild but keep recording** — `--force` always runs the command
 while still writing a fresh manifest, refreshing an entry without deleting the
+store:
+
+```bash
+cairn-run --force --input src.c --output a.o -- cc -c src.c -o a.o
+```
+
+**Audit a shared store** — compute the key with the engine, then inspect and
+verify without running anything:
+
+```bash
+key=$(cairn key --input src.c -- cc -c src.c -o a.o)
+cairn show   --key "$key"
