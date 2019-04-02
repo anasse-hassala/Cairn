@@ -368,3 +368,15 @@ cairn verify --key "$key"
 | `hash`    | Print content digests (and sizes) of one or more files.           |
 | `key`     | Compute a cache key from `--input` files and an optional `-- cmd`. |
 | `store`   | Store `--output` files and write a manifest for the computed key. |
+| `restore` | Restore outputs for `--key` into `--out-dir` (default `.`).       |
+| `verify`  | Verify integrity for `--key`; reports ok/missing/corrupt + key.   |
+| `show`    | Print a manifest as canonical JSON.                               |
+| `version` | Print the tool version and format version.                        |
+
+Global options: `--cache-dir DIR` (default `.cairn-cache`), `--base-dir DIR`
+(default `.`), and `--` to end flags and begin the command.
+
+### `cairn-run` — the Go surveyor
+
+```
+cairn-run [--cache-dir DIR] [--base-dir DIR] \
