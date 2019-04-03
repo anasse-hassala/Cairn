@@ -380,3 +380,15 @@ Global options: `--cache-dir DIR` (default `.cairn-cache`), `--base-dir DIR`
 
 ```
 cairn-run [--cache-dir DIR] [--base-dir DIR] \
+          [--input F]... [--output F]... [--force] [--verbose] \
+          -- <command> [args...]
+
+cairn-run hash <file>...     # standalone, prints digests
+cairn-run version            # standalone, prints version + format version
+```
+
+On a hit the declared outputs are restored and the command is skipped; on a
+miss the command runs, outputs are captured, and a manifest is written. Failed
+commands are never cached. `--verbose` narrates every cache decision on stderr.
+
+## Field milestones — the route so far
