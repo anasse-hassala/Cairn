@@ -7,3 +7,4 @@ license = "MIT"
 repository = "https://github.com/example/cairn"
 readme = "../README.md"
 
+[[bin]]
