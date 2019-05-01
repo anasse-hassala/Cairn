@@ -28,3 +28,8 @@ pub struct Hasher {
 }
 
 impl Default for Hasher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
