@@ -38,3 +38,8 @@ impl Hasher {
     pub fn new() -> Self {
         Self {
             state: FNV_OFFSET_BASIS,
+        }
+    }
+
+    /// Absorb a chunk of bytes into the running digest.
+    pub fn update(&mut self, bytes: &[u8]) {
