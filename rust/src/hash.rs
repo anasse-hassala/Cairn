@@ -54,3 +54,8 @@ impl Hasher {
     /// Return the raw 64-bit digest of everything absorbed so far.
     pub fn finalize(&self) -> u64 {
         self.state
+    }
+
+    /// Return the canonical digest: a zero-padded, lowercase, 16-char hex
+    /// string. This is the exact form Cairn uses as a content address and the
+    /// form the Go implementation must reproduce byte-for-byte.
