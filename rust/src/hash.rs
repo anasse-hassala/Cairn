@@ -75,3 +75,8 @@ pub fn hash_bytes(bytes: &[u8]) -> String {
 mod tests {
     use super::*;
 
+    #[test]
+    fn known_vectors() {
+        // Empty input hashes to the offset basis.
+        assert_eq!(hash_bytes(b""), "cbf29ce484222325");
+        // Well-known FNV-1a 64 test vector for "a".
