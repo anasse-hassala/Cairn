@@ -83,3 +83,18 @@ impl Json {
             Json::Str(s) => Some(s),
             _ => None,
         }
+    }
+
+    /// Borrow this value as an unsigned integer.
+    pub fn as_uint(&self) -> Option<u64> {
+        match self {
+            Json::Uint(n) => Some(*n),
+            _ => None,
+        }
+    }
+
+    /// Borrow this value as a boolean.
+    pub fn as_bool(&self) -> Option<bool> {
+        match self {
+            Json::Bool(b) => Some(*b),
+            _ => None,
