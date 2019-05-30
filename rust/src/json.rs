@@ -68,3 +68,18 @@ impl Json {
             _ => None,
         }
     }
+
+    /// Look up a key in an object value.
+    pub fn get(&self, key: &str) -> Option<&Json> {
+        self.as_object()?
+            .iter()
+            .find(|(k, _)| k == key)
+            .map(|(_, v)| v)
+    }
+
+    /// Borrow this value as a string.
+    pub fn as_str(&self) -> Option<&str> {
+        match self {
+            Json::Str(s) => Some(s),
+            _ => None,
+        }
