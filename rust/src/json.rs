@@ -157,3 +157,17 @@ pub fn parse(input: &str) -> Result<Json, ParseError> {
     p.skip_ws();
     let value = p.parse_value()?;
     p.skip_ws();
+    if p.pos != p.bytes.len() {
+        return Err(p.err("trailing characters after JSON value"));
+    }
+    Ok(value)
+}
+
+struct Parser<'a> {
+    bytes: &'a [u8],
+    pos: usize,
+}
+
+impl<'a> Parser<'a> {
+    fn err(&self, msg: &str) -> ParseError {
+        ParseError {
