@@ -98,3 +98,17 @@ impl Json {
         match self {
             Json::Bool(b) => Some(*b),
             _ => None,
+        }
+    }
+
+    /// Borrow this value as an array.
+    pub fn as_array(&self) -> Option<&[Json]> {
+        match self {
+            Json::Array(a) => Some(a),
+            _ => None,
+        }
+    }
+}
+
+/// Write a JSON string literal, escaping per RFC 8259.
+fn write_json_string(s: &str, out: &mut String) {
