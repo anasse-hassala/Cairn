@@ -201,3 +201,17 @@ impl<'a> Parser<'a> {
         }
     }
 
+    fn parse_bool(&mut self) -> Result<Json, ParseError> {
+        if self.bytes[self.pos..].starts_with(b"true") {
+            self.pos += 4;
+            Ok(Json::Bool(true))
+        } else if self.bytes[self.pos..].starts_with(b"false") {
+            self.pos += 5;
+            Ok(Json::Bool(false))
+        } else {
+            Err(self.err("invalid literal"))
+        }
+    }
+
+    fn parse_uint(&mut self) -> Result<Json, ParseError> {
+        let start = self.pos;
