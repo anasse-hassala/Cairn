@@ -4,3 +4,4 @@
 //! content-addressed store) plus a CLI binary (`cairn`). The manifest format
 //! and hashing scheme are documented in `docs/FORMAT.md` and are reproduced
 //! exactly by the companion Go wrapper so the two tools interoperate.
+//!
