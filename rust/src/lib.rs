@@ -7,3 +7,4 @@
 //!
 //! # Modules
 //!
+//! - [`hash`]: deterministic, non-cryptographic FNV-1a content hashing.
