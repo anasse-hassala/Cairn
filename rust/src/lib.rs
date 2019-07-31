@@ -8,3 +8,4 @@
 //! # Modules
 //!
 //! - [`hash`]: deterministic, non-cryptographic FNV-1a content hashing.
+//! - [`json`]: a tiny std-only JSON reader/writer for canonical manifests.
