@@ -11,3 +11,4 @@
 //! - [`json`]: a tiny std-only JSON reader/writer for canonical manifests.
 //! - [`manifest`]: the cross-language cache-entry format.
 //! - [`store`]: the on-disk content-addressed object/manifest store.
+
