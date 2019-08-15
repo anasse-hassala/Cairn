@@ -12,3 +12,5 @@
 //! - [`manifest`]: the cross-language cache-entry format.
 //! - [`store`]: the on-disk content-addressed object/manifest store.
 
+pub mod hash;
+pub mod json;
