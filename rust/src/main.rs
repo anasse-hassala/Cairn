@@ -38,3 +38,15 @@ fn run(args: &[String]) -> Result<ExitCode, String> {
     let Some((cmd, rest)) = args.split_first() else {
         print_usage();
         return Ok(ExitCode::FAILURE);
+    };
+    match cmd.as_str() {
+        "hash" => cmd_hash(rest),
+        "key" => cmd_key(rest),
+        "store" => cmd_store(rest),
+        "restore" => cmd_restore(rest),
+        "verify" => cmd_verify(rest),
+        "show" => cmd_show(rest),
+        "help" | "-h" | "--help" => {
+            print_usage();
+            Ok(ExitCode::SUCCESS)
+        }
