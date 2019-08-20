@@ -15,3 +15,4 @@
 pub mod hash;
 pub mod json;
 pub mod manifest;
+pub mod store;
