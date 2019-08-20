@@ -26,3 +26,15 @@ const PRODUCER: &str = "cairn-rust";
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     match run(&args) {
+        Ok(code) => code,
+        Err(e) => {
+            eprintln!("cairn: error: {e}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn run(args: &[String]) -> Result<ExitCode, String> {
+    let Some((cmd, rest)) = args.split_first() else {
+        print_usage();
+        return Ok(ExitCode::FAILURE);
