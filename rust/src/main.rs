@@ -50,3 +50,15 @@ fn run(args: &[String]) -> Result<ExitCode, String> {
             print_usage();
             Ok(ExitCode::SUCCESS)
         }
+        "version" | "--version" | "-V" => {
+            println!(
+                "cairn {} (format v{})",
+                env!("CARGO_PKG_VERSION"),
+                FORMAT_VERSION
+            );
+            Ok(ExitCode::SUCCESS)
+        }
+        other => Err(format!("unknown subcommand '{other}' (try 'cairn help')")),
+    }
+}
+
