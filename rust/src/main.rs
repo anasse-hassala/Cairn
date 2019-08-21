@@ -85,3 +85,15 @@ fn parse(args: &[String]) -> Result<Parsed, String> {
         match a.as_str() {
             "--" => {
                 p.command = args[i + 1..].to_vec();
+                break;
+            }
+            "--input" | "-i" => {
+                p.inputs.push(take_value(args, &mut i, a)?);
+            }
+            "--output" | "-o" => {
+                p.outputs.push(take_value(args, &mut i, a)?);
+            }
+            "--key" | "-k" => {
+                p.key = Some(take_value(args, &mut i, a)?);
+            }
+            "--cache-dir" => {
