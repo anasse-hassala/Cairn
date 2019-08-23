@@ -97,3 +97,15 @@ fn parse(args: &[String]) -> Result<Parsed, String> {
                 p.key = Some(take_value(args, &mut i, a)?);
             }
             "--cache-dir" => {
+                p.cache_dir = Some(take_value(args, &mut i, a)?);
+            }
+            "--out-dir" => {
+                p.out_dir = Some(take_value(args, &mut i, a)?);
+            }
+            "--base-dir" => {
+                p.base_dir = Some(take_value(args, &mut i, a)?);
+            }
+            other if other.starts_with('-') => {
+                return Err(format!("unknown flag '{other}'"));
+            }
+            _ => p.positional.push(a.clone()),
