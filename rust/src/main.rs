@@ -109,3 +109,15 @@ fn parse(args: &[String]) -> Result<Parsed, String> {
                 return Err(format!("unknown flag '{other}'"));
             }
             _ => p.positional.push(a.clone()),
+        }
+        i += 1;
+    }
+    Ok(p)
+}
+
+fn take_value(args: &[String], i: &mut usize, flag: &str) -> Result<String, String> {
+    *i += 1;
+    args.get(*i)
+        .cloned()
+        .ok_or_else(|| format!("flag '{flag}' requires a value"))
+}
