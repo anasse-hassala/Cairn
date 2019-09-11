@@ -133,3 +133,14 @@ fn cache_root(p: &Parsed) -> PathBuf {
 fn base_dir(p: &Parsed) -> PathBuf {
     PathBuf::from(p.base_dir.clone().unwrap_or_else(|| ".".to_string()))
 }
+
+fn cmd_hash(args: &[String]) -> Result<ExitCode, String> {
+    let p = parse(args)?;
+    let files = if p.positional.is_empty() {
+        &p.inputs
+    } else {
+        &p.positional
+    };
+    if files.is_empty() {
+        return Err("hash: expected one or more file paths".into());
+    }
