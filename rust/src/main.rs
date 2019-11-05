@@ -156,3 +156,15 @@ fn cmd_key(args: &[String]) -> Result<ExitCode, String> {
     if p.inputs.is_empty() {
         return Err("key: expected at least one --input".into());
     }
+    let base = base_dir(&p);
+    let inputs = Store::hash_inputs(&base, &p.inputs).map_err(|e| e.to_string())?;
+    let key = Manifest::compute_key(&inputs, &p.command);
+    println!("{key}");
+    Ok(ExitCode::SUCCESS)
+}
+
+fn cmd_store(args: &[String]) -> Result<ExitCode, String> {
+    let p = parse(args)?;
+    if p.inputs.is_empty() {
+        return Err("store: expected at least one --input".into());
+    }
