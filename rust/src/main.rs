@@ -192,3 +192,14 @@ fn cmd_store(args: &[String]) -> Result<ExitCode, String> {
         command: p.command.clone(),
         inputs,
         outputs,
+    };
+    store.put_manifest(&manifest).map_err(|e| e.to_string())?;
+    println!("stored {} (outputs: {})", key, manifest.outputs.len());
+    Ok(ExitCode::SUCCESS)
+}
+
+fn cmd_restore(args: &[String]) -> Result<ExitCode, String> {
+    let p = parse(args)?;
+    let key = p.key.clone().ok_or("restore: --key is required")?;
+    let store = Store::open(cache_root(&p)).map_err(|e| e.to_string())?;
+    let Some(manifest) = store.get_manifest(&key).map_err(|e| e.to_string())? else {
