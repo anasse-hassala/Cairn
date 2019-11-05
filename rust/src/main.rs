@@ -180,3 +180,15 @@ fn cmd_store(args: &[String]) -> Result<ExitCode, String> {
             );
             computed_key
         }
+        _ => computed_key,
+    };
+    let outputs = store
+        .store_outputs(&base, &p.outputs)
+        .map_err(|e| e.to_string())?;
+    let manifest = Manifest {
+        version: FORMAT_VERSION,
+        producer: PRODUCER.to_string(),
+        key: key.clone(),
+        command: p.command.clone(),
+        inputs,
+        outputs,
