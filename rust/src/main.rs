@@ -203,3 +203,15 @@ fn cmd_restore(args: &[String]) -> Result<ExitCode, String> {
     let key = p.key.clone().ok_or("restore: --key is required")?;
     let store = Store::open(cache_root(&p)).map_err(|e| e.to_string())?;
     let Some(manifest) = store.get_manifest(&key).map_err(|e| e.to_string())? else {
+        eprintln!("cairn: cache miss for key {key}");
+        return Ok(ExitCode::from(2));
+    };
+    let out_dir = PathBuf::from(p.out_dir.clone().unwrap_or_else(|| ".".to_string()));
+    let n = store
+        .restore_outputs(&out_dir, &manifest)
+        .map_err(|e| e.to_string())?;
+    println!("restored {n} output(s) for key {key}");
+    Ok(ExitCode::SUCCESS)
+}
+
+fn cmd_verify(args: &[String]) -> Result<ExitCode, String> {
