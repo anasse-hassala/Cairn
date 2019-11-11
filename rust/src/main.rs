@@ -215,3 +215,15 @@ fn cmd_restore(args: &[String]) -> Result<ExitCode, String> {
 }
 
 fn cmd_verify(args: &[String]) -> Result<ExitCode, String> {
+    let p = parse(args)?;
+    let key = p.key.clone().ok_or("verify: --key is required")?;
+    let store = Store::open(cache_root(&p)).map_err(|e| e.to_string())?;
+    let Some(manifest) = store.get_manifest(&key).map_err(|e| e.to_string())? else {
+        return Err(format!("no manifest for key {key}"));
+    };
+    let report = store
+        .verify_manifest(&manifest)
+        .map_err(|e| e.to_string())?;
+    println!(
+        "key {key}: {} ok, {} missing, {} corrupt, key_matches={}",
+        report.ok,
