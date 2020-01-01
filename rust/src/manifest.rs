@@ -56,3 +56,14 @@ impl Manifest {
     /// Compute the canonical cache key from a set of inputs and an optional
     /// command.
     ///
+    /// The key is defined as the FNV-1a digest of a canonical byte stream:
+    ///
+    /// ```text
+    /// "cairn-key\x00" version "\x00"
+    /// for each input (sorted by path):
+    ///     path "\x00" digest "\x00" size "\x00"
+    /// "cmd\x00"
+    /// for each command arg (in order):
+    ///     arg "\x00"
+    /// ```
+    ///
