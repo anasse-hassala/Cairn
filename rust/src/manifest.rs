@@ -34,3 +34,14 @@ pub struct OutputEntry {
     /// Size in bytes.
     pub size: u64,
 }
+
+/// A complete cache manifest.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Manifest {
+    /// Format version.
+    pub version: u64,
+    /// Tool that produced this manifest, e.g. "cairn-rust" or "cairn-go".
+    pub producer: String,
+    /// The overall cache key derived from inputs (+ optional command).
+    pub key: String,
+    /// The command associated with this entry, if any (empty for pure hashing).
