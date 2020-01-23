@@ -100,3 +100,14 @@ impl Manifest {
                         ("path", Json::Str(i.path.clone())),
                         ("digest", Json::Str(i.digest.clone())),
                         ("size", Json::Uint(i.size)),
+                    ])
+                })
+                .collect(),
+        );
+        let outputs = Json::Array(
+            self.outputs
+                .iter()
+                .map(|o| {
+                    json::object(vec![
+                        ("path", Json::Str(o.path.clone())),
+                        ("digest", Json::Str(o.digest.clone())),
