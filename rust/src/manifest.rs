@@ -144,3 +144,14 @@ impl Manifest {
             .get("key")
             .and_then(Json::as_str)
             .ok_or("missing 'key'")?
+            .to_string();
+        let command = doc
+            .get("command")
+            .and_then(Json::as_array)
+            .ok_or("missing 'command'")?
+            .iter()
+            .map(|v| {
+                v.as_str()
+                    .map(str::to_string)
+                    .ok_or("command arg not a string")
+            })
