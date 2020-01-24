@@ -166,3 +166,14 @@ impl Manifest {
             .collect();
         Ok(Manifest {
             version,
+            producer,
+            key,
+            command,
+            inputs,
+            outputs,
+        })
+    }
+}
+
+fn parse_entries(value: &Json) -> Result<Vec<(String, String, u64)>, String> {
+    let arr = value.as_array().ok_or("expected array of entries")?;
