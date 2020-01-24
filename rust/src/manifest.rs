@@ -111,3 +111,14 @@ impl Manifest {
                     json::object(vec![
                         ("path", Json::Str(o.path.clone())),
                         ("digest", Json::Str(o.digest.clone())),
+                        ("size", Json::Uint(o.size)),
+                    ])
+                })
+                .collect(),
+        );
+        let command = Json::Array(self.command.iter().map(|c| Json::Str(c.clone())).collect());
+        let doc = json::object(vec![
+            ("version", Json::Uint(self.version)),
+            ("producer", Json::Str(self.producer.clone())),
+            ("key", Json::Str(self.key.clone())),
+            ("command", command),
