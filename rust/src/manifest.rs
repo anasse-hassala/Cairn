@@ -155,3 +155,14 @@ impl Manifest {
                     .map(str::to_string)
                     .ok_or("command arg not a string")
             })
+            .collect::<Result<Vec<_>, _>>()?;
+        let inputs = parse_entries(doc.get("inputs").ok_or("missing 'inputs'")?)?
+            .into_iter()
+            .map(|(path, digest, size)| InputEntry { path, digest, size })
+            .collect();
+        let outputs = parse_entries(doc.get("outputs").ok_or("missing 'outputs'")?)?
+            .into_iter()
+            .map(|(path, digest, size)| OutputEntry { path, digest, size })
+            .collect();
+        Ok(Manifest {
+            version,
