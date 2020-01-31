@@ -199,3 +199,14 @@ fn parse_entries(value: &Json) -> Result<Vec<(String, String, u64)>, String> {
 }
 
 #[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn sample() -> Manifest {
+        let inputs = vec![
+            InputEntry {
+                path: "src/a.txt".into(),
+                digest: "af63dc4c8601ec8c".into(),
+                size: 1,
+            },
+            InputEntry {
