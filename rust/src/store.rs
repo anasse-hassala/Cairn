@@ -53,3 +53,14 @@ impl Store {
         Ok(Store { root })
     }
 
+    /// The path where a blob with the given digest lives.
+    fn object_path(&self, digest: &str) -> PathBuf {
+        let shard = &digest[..2.min(digest.len())];
+        self.root.join("objects").join(shard).join(digest)
+    }
+
+    /// The path where a manifest with the given key lives.
+    fn manifest_path(&self, key: &str) -> PathBuf {
+        self.root.join("manifests").join(format!("{key}.json"))
+    }
+
