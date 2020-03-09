@@ -64,3 +64,15 @@ impl Store {
         self.root.join("manifests").join(format!("{key}.json"))
     }
 
+    /// Store a blob by its content, returning its digest. Idempotent: writing
+    /// content that already exists is a no-op.
+    pub fn put_blob(&self, content: &[u8]) -> std::io::Result<String> {
+        let mut hasher = Hasher::new();
+        hasher.update(content);
+        let digest = hasher.finalize_hex();
+        let dest = self.object_path(&digest);
+        if dest.exists() {
+            return Ok(digest);
+        }
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent)?;
