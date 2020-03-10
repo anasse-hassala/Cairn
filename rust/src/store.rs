@@ -76,3 +76,15 @@ impl Store {
         }
         if let Some(parent) = dest.parent() {
             fs::create_dir_all(parent)?;
+        }
+        // Write to a temp file then rename for atomicity.
+        let tmp = dest.with_extension("tmp");
+        {
+            let mut f = fs::File::create(&tmp)?;
+            f.write_all(content)?;
+            f.sync_all()?;
+        }
+        fs::rename(&tmp, &dest)?;
+        Ok(digest)
+    }
+
