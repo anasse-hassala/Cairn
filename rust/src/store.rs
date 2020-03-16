@@ -123,3 +123,15 @@ impl Store {
     }
 
     /// Load a manifest by key, if present.
+    pub fn get_manifest(&self, key: &str) -> std::io::Result<Option<Manifest>> {
+        let path = self.manifest_path(key);
+        if !path.exists() {
+            return Ok(None);
+        }
+        let text = fs::read_to_string(path)?;
+        Manifest::from_json(&text)
+            .map(Some)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))
+    }
+
+    /// True if a manifest exists for the key.
