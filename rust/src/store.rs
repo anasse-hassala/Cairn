@@ -147,3 +147,15 @@ impl Store {
         for p in paths {
             let full = base.join(p);
             let (digest, size) = hash_file(&full)?;
+            entries.push(InputEntry {
+                path: normalize_path(p),
+                digest,
+                size,
+            });
+        }
+        entries.sort_by(|a, b| a.path.cmp(&b.path));
+        Ok(entries)
+    }
+
+    /// Store output files as blobs and produce sorted output entries.
+    pub fn store_outputs(
