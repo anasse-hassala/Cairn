@@ -135,3 +135,15 @@ impl Store {
     }
 
     /// True if a manifest exists for the key.
+    pub fn has_manifest(&self, key: &str) -> bool {
+        self.manifest_path(key).exists()
+    }
+
+    /// Hash a set of input files (relative to `base`) into sorted input
+    /// entries. Paths are normalized to forward slashes for cross-platform
+    /// stability.
+    pub fn hash_inputs(base: &Path, paths: &[String]) -> std::io::Result<Vec<InputEntry>> {
+        let mut entries = Vec::with_capacity(paths.len());
+        for p in paths {
+            let full = base.join(p);
+            let (digest, size) = hash_file(&full)?;
