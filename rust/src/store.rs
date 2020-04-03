@@ -170,3 +170,15 @@ impl Store {
             entries.push(OutputEntry {
                 path: normalize_path(p),
                 digest,
+                size,
+            });
+        }
+        entries.sort_by(|a, b| a.path.cmp(&b.path));
+        Ok(entries)
+    }
+
+    /// Restore all outputs from a manifest into `base`. Returns the number of
+    /// files written. Fails if any referenced blob is missing.
+    pub fn restore_outputs(&self, base: &Path, manifest: &Manifest) -> std::io::Result<usize> {
+        for out in &manifest.outputs {
+            if !self.has_blob(&out.digest) {
