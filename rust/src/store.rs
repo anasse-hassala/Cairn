@@ -182,3 +182,15 @@ impl Store {
     pub fn restore_outputs(&self, base: &Path, manifest: &Manifest) -> std::io::Result<usize> {
         for out in &manifest.outputs {
             if !self.has_blob(&out.digest) {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    format!("missing blob {} for output {}", out.digest, out.path),
+                ));
+            }
+        }
+        let mut written = 0;
+        for out in &manifest.outputs {
+            let content = self.get_blob(&out.digest)?;
+            let dest = base.join(&out.path);
+            if let Some(parent) = dest.parent() {
+                fs::create_dir_all(parent)?;
