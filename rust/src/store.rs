@@ -194,3 +194,15 @@ impl Store {
             let dest = base.join(&out.path);
             if let Some(parent) = dest.parent() {
                 fs::create_dir_all(parent)?;
+            }
+            fs::write(&dest, &content)?;
+            written += 1;
+        }
+        Ok(written)
+    }
+
+    /// Verify store integrity for a manifest: every referenced blob must exist
+    /// and re-hash to its recorded digest. Returns a report.
+    pub fn verify_manifest(&self, manifest: &Manifest) -> std::io::Result<VerifyReport> {
+        let mut report = VerifyReport::default();
+        for out in &manifest.outputs {
