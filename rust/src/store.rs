@@ -218,3 +218,14 @@ impl Store {
                 }
                 Err(_) => report.missing.push(out.digest.clone()),
             }
+        }
+        // Recompute the key from inputs + command and confirm it matches.
+        let recomputed = Manifest::compute_key(&manifest.inputs, &manifest.command);
+        report.key_matches = recomputed == manifest.key;
+        Ok(report)
+    }
+}
+
+/// Result of verifying a manifest against the store.
+#[derive(Debug, Default)]
+pub struct VerifyReport {
