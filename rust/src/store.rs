@@ -229,3 +229,15 @@ impl Store {
 /// Result of verifying a manifest against the store.
 #[derive(Debug, Default)]
 pub struct VerifyReport {
+    /// Number of outputs present and matching their digest.
+    pub ok: usize,
+    /// Digests of outputs whose blob is missing.
+    pub missing: Vec<String>,
+    /// Digests of outputs whose blob content no longer matches.
+    pub corrupt: Vec<String>,
+    /// Whether the recomputed key matches the stored key.
+    pub key_matches: bool,
+}
+
+impl VerifyReport {
+    /// True when nothing is missing or corrupt and the key checks out.
