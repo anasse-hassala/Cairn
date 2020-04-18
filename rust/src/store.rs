@@ -241,3 +241,15 @@ pub struct VerifyReport {
 
 impl VerifyReport {
     /// True when nothing is missing or corrupt and the key checks out.
+    pub fn is_healthy(&self) -> bool {
+        self.missing.is_empty() && self.corrupt.is_empty() && self.key_matches
+    }
+}
+
+/// Normalize a path string to forward slashes for cross-platform manifests.
+pub fn normalize_path(p: &str) -> String {
+    p.replace('\\', "/")
+}
+
+#[cfg(test)]
+mod tests {
