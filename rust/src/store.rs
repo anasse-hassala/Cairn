@@ -265,3 +265,14 @@ mod tests {
         d.push(format!("cairn-test-{tag}-{nanos}"));
         fs::create_dir_all(&d).unwrap();
         d
+    }
+
+    #[test]
+    fn blob_roundtrip_and_dedup() {
+        let dir = temp_dir("blob");
+        let store = Store::open(dir.join("cache")).unwrap();
+        let d1 = store.put_blob(b"hello").unwrap();
+        let d2 = store.put_blob(b"hello").unwrap();
+        assert_eq!(d1, d2);
+        assert!(store.has_blob(&d1));
+        assert_eq!(store.get_blob(&d1).unwrap(), b"hello");
