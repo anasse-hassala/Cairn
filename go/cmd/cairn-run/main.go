@@ -25,3 +25,19 @@
 //	cairn-run version           print version
 package main
 
+import (
+	"errors"
+	"fmt"
+	"os"
+	"os/exec"
+	"strings"
+
+	"github.com/example/cairn/go/internal/cache"
+)
+
+const (
+	version       = "0.1.0"
+	defaultCache  = ".cairn-cache"
+	producer      = "cairn-go"
+	exitError     = 1
+	exitCacheMiss = 2
