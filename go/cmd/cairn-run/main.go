@@ -88,3 +88,19 @@ func main() {
 	}
 	os.Exit(code)
 }
+
+func parseOptions(args []string) (options, error) {
+	opts := options{cacheDir: defaultCache, baseDir: "."}
+	i := 0
+	for i < len(args) {
+		a := args[i]
+		switch a {
+		case "--":
+			opts.command = args[i+1:]
+			i = len(args)
+			continue
+		case "--cache-dir":
+			v, err := takeValue(args, &i, a)
+			if err != nil {
+				return opts, err
+			}
