@@ -72,3 +72,19 @@ func main() {
 		if err := cmdHash(args[1:]); err != nil {
 			fmt.Fprintf(os.Stderr, "cairn-run: error: %v\n", err)
 			os.Exit(exitError)
+		}
+		return
+	}
+
+	opts, err := parseOptions(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "cairn-run: error: %v\n", err)
+		os.Exit(exitError)
+	}
+	code, err := runWrapped(opts)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "cairn-run: error: %v\n", err)
+		os.Exit(exitError)
+	}
+	os.Exit(code)
+}
