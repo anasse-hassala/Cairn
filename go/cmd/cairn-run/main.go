@@ -120,3 +120,19 @@ func parseOptions(args []string) (options, error) {
 		case "--output", "-o":
 			v, err := takeValue(args, &i, a)
 			if err != nil {
+				return opts, err
+			}
+			opts.outputs = append(opts.outputs, v)
+		case "--force":
+			opts.force = true
+		case "--verbose":
+			opts.verbose = true
+		default:
+			return opts, fmt.Errorf("unknown flag %q", a)
+		}
+		i++
+	}
+	if len(opts.command) == 0 {
+		return opts, fmt.Errorf("no command given (expected '-- <command> [args...]')")
+	}
+	return opts, nil
