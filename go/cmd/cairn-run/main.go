@@ -200,3 +200,19 @@ func runWrapped(opts options) (int, error) {
 	outputs, err := store.StoreOutputs(opts.baseDir, opts.outputs)
 	if err != nil {
 		return exitError, err
+	}
+	manifest := &cache.Manifest{
+		Version:  cache.FormatVersion,
+		Producer: producer,
+		Key:      key,
+		Command:  opts.command,
+		Inputs:   inputs,
+		Outputs:  outputs,
+	}
+	if err := store.PutManifest(manifest); err != nil {
+		return exitError, err
+	}
+	if opts.verbose {
+		fmt.Fprintf(os.Stderr, "cairn-run: stored manifest %s (%d output(s))\n", key, len(outputs))
+	}
+	return 0, nil
