@@ -21,3 +21,12 @@ func TestKnownVectors(t *testing.T) {
 	}
 }
 
+func TestStreamingMatchesOneShot(t *testing.T) {
+	h := NewHasher()
+	h.Update([]byte("foo"))
+	h.Update([]byte("bar"))
+	if got := h.Hex(); got != HashBytes([]byte("foobar")) {
+		t.Errorf("streaming digest %s != one-shot", got)
+	}
+}
+
