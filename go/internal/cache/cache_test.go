@@ -30,3 +30,13 @@ func TestStreamingMatchesOneShot(t *testing.T) {
 	}
 }
 
+// The manifest JSON produced here must match, byte-for-byte, what the Rust
+// engine emits for the same logical manifest (see rust manifest tests).
+func TestManifestCanonicalJSON(t *testing.T) {
+	inputs := []Entry{
+		{Path: "src/a.txt", Digest: "af63dc4c8601ec8c", Size: 1},
+		{Path: "src/b.txt", Digest: "85944171f73967e8", Size: 6},
+	}
+	command := []string{"cc", "-c"}
+	key := ComputeKey(inputs, command)
+	m := &Manifest{
