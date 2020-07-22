@@ -68,3 +68,13 @@ func TestKeyStableAndCommandSensitive(t *testing.T) {
 	if k1 != k2 {
 		t.Errorf("key not stable: %s != %s", k1, k2)
 	}
+	k3 := ComputeKey(inputs, []string{"go", "test"})
+	if k1 == k3 {
+		t.Errorf("key should change with command")
+	}
+}
+
+func TestStoreRestoreVerify(t *testing.T) {
+	dir := t.TempDir()
+	work := filepath.Join(dir, "work")
+	if err := os.MkdirAll(work, 0o755); err != nil {
