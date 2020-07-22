@@ -78,3 +78,12 @@ func TestStoreRestoreVerify(t *testing.T) {
 	dir := t.TempDir()
 	work := filepath.Join(dir, "work")
 	if err := os.MkdirAll(work, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(work, "in.txt"), []byte("foobar"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(work, "out.txt"), []byte("result-bytes"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
