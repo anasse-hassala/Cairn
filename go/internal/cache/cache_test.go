@@ -106,3 +106,13 @@ func TestStoreRestoreVerify(t *testing.T) {
 		Producer: producerTag,
 		Key:      key,
 		Command:  command,
+		Inputs:   inputs,
+		Outputs:  outputs,
+	}
+	if err := store.PutManifest(m); err != nil {
+		t.Fatal(err)
+	}
+
+	// Remove output and restore it.
+	if err := os.Remove(filepath.Join(work, "out.txt")); err != nil {
+		t.Fatal(err)
