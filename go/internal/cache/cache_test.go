@@ -97,3 +97,12 @@ func TestStoreRestoreVerify(t *testing.T) {
 	}
 	command := []string{"build"}
 	key := ComputeKey(inputs, command)
+	outputs, err := store.StoreOutputs(work, []string{"out.txt"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := &Manifest{
+		Version:  FormatVersion,
+		Producer: producerTag,
+		Key:      key,
+		Command:  command,
