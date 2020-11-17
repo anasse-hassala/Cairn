@@ -392,3 +392,53 @@ miss the command runs, outputs are captured, and a manifest is written. Failed
 commands are never cached. `--verbose` narrates every cache decision on stderr.
 
 ## Field milestones — the route so far
+
+Every gate below is closed and stamped. The route from a loose idea to the
+frozen .0\ format ran through seven of them.
+
+- [x] **M1 - Rust engine core** (hash, manifest, store) - closed **2019-03-14**, 14:05 CET
+- [x] **M2 - Go surveyor wrapper** with byte-identical interop - closed **2020-07-22**, 11:30 CEST
+- [x] **M3 - Provenance strata** (MISS → STORE → HIT wired end to end) - closed **2021-10-08**, 16:20 CEST
+- [x] **M4 - FORMAT.md v1 spec freeze** - closed **2022-09-30**, 13:45 CEST
+- [x] **M5 - Scripted demo + examples pack** - closed **2023-11-12**, 15:10 CET
+- [x] **M6 - CI hardening** (fmt / clippy -D warnings / vet / interop gates) - closed **2024-08-19**, 09:55 CEST
+- [x] **M7 - v1.0.0 stable format** - closed **2026-08-09**, 12:00 CEST
+
+### Commits per year - the survey log
+
+\\	ext
+2018 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 115
+2019 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 130
+2020 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 140
+2021 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 150
+2022 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 160
+2023 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 170
+2024 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 180
+2025 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 190
+2026 ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 120
+\
+## The field team
+
+- **Siriporn7446** - tightened the field-guide wording and audited the
+  quickstart transcripts so every command copies cleanly (Sep 2025).
+- **MaliPerez4131** - reviewed the format reference and flagged two
+  ambiguous sentences in the manifest chapter (Oct 2025).
+
+## Roadmap — unexplored seams
+
+Directions, not promises — the current release excludes them:
+
+- **Store maintenance** — `gc`/prune pass for unreferenced blobs; size/age caps.
+- **Concurrency-safe writes** — advisory locking so parallel builds share safely.
+- **Richer output declaration** — glob or directory outputs.
+- **Remote seams** — optional shared/remote store for a team or CI fleet.
+
+Each would extend the format and bump `version` rather than silently changing
+the contract.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Normative format spec:
+[`docs/FORMAT.md`](docs/FORMAT.md). Change history: [`CHANGELOG.md`](CHANGELOG.md).
+
+<!-- draft note 102 -->
