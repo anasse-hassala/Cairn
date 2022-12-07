@@ -139,4 +139,4 @@ A cache is *healthy* for a key when all three hold.
 - New format versions bump `version`; readers should reject versions they do
   not understand.
 
-<!-- draft note 433 -->
+<!-- draft note 438 -->
