@@ -1,46 +1,34 @@
-package cache
+# Changelog
 
-import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-)
+All notable changes to this project are documented here. The format is based
+on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
+adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-// wireManifest mirrors the JSON structure for decoding. We decode with the
-// standard library, then convert to the strongly typed Manifest. Encoding is
-// done by hand (ToJSON) to guarantee canonical byte output.
-type wireManifest struct {
-	Version  uint64      `json:"version"`
-	Producer string      `json:"producer"`
-	Key      string      `json:"key"`
-	Command  []string    `json:"command"`
-	Inputs   []wireEntry `json:"inputs"`
-	Outputs  []wireEntry `json:"outputs"`
-}
+## [0.1.0] - 2026-08-31
 
-type wireEntry struct {
-	Path   string `json:"path"`
-	Digest string `json:"digest"`
-	Size   uint64 `json:"size"`
-}
+### Added
 
-// ParseManifest decodes a manifest from JSON produced by either implementation.
-func ParseManifest(data []byte) (*Manifest, error) {
-	var w wireManifest
-	dec := json.NewDecoder(bytes.NewReader(data))
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&w); err != nil {
-		return nil, fmt.Errorf("decoding manifest: %w", err)
-	}
-	m := &Manifest{
-		Version:  w.Version,
-		Producer: w.Producer,
-		Key:      w.Key,
-		Command:  w.Command,
-		Inputs:   convertEntries(w.Inputs),
-		Outputs:  convertEntries(w.Outputs),
-	}
-	if m.Command == nil {
-		m.Command = []string{}
-	}
-	return m, nil
+- **Rust engine (`cairn`)** — content-addressed store with hashing,
+  store/restore of output manifests, and integrity verification.
+  - `hash`, `key`, `store`, `restore`, `verify`, `show` subcommands.
+  - Standard-library-only implementation, including a small canonical JSON
+    reader/writer.
+- **Go wrapper (`cairn-run`)** — cache-aware command execution.
+  - Cache HIT restores declared outputs; MISS runs the command and captures
+    outputs. Failed commands are not cached.
+  - `hash` and `version` helper subcommands.
+- **Shared format v1** — FNV-1a 64-bit content hashing, canonical cache-key
+  stream, and canonical manifest JSON, documented in `docs/FORMAT.md` and
+  reproduced byte-for-byte by both tools.
+- Cross-language reference-vector tests guarding digest and key parity.
+- Demo scripts (`examples/demo.sh`, `examples/demo.ps1`), Makefile, and GitHub
+  Actions CI (Rust, Go, and an interop job running the demo).
+
+### Notes
+
+- The hash is intentionally **non-cryptographic**; Cairn is a build cache, not
+  a security boundary. See `docs/FORMAT.md` for the rationale.
+
+[0.1.0]: https://github.com/example/cairn/releases/tag/v0.1.0
+
+// draft note 903
