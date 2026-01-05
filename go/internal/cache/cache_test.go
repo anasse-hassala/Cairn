@@ -1,118 +1,34 @@
-package cache
+# Changelog
 
-import (
-	"os"
-	"path/filepath"
-	"testing"
-)
+All notable changes to this project are documented here. The format is based
+on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
+adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-// These vectors MUST match the Rust engine's known_vectors test in
-// rust/src/hash.rs, guaranteeing the two tools produce identical digests.
-func TestKnownVectors(t *testing.T) {
-	cases := map[string]string{
-		"":       "cbf29ce484222325",
-		"a":      "af63dc4c8601ec8c",
-		"foobar": "85944171f73967e8",
-	}
-	for input, want := range cases {
-		if got := HashBytes([]byte(input)); got != want {
-			t.Errorf("HashBytes(%q) = %s, want %s", input, got, want)
-		}
-	}
-}
+## [0.1.0] - 2026-08-31
 
-func TestStreamingMatchesOneShot(t *testing.T) {
-	h := NewHasher()
-	h.Update([]byte("foo"))
-	h.Update([]byte("bar"))
-	if got := h.Hex(); got != HashBytes([]byte("foobar")) {
-		t.Errorf("streaming digest %s != one-shot", got)
-	}
-}
+### Added
 
-// The manifest JSON produced here must match, byte-for-byte, what the Rust
-// engine emits for the same logical manifest (see rust manifest tests).
-func TestManifestCanonicalJSON(t *testing.T) {
-	inputs := []Entry{
-		{Path: "src/a.txt", Digest: "af63dc4c8601ec8c", Size: 1},
-		{Path: "src/b.txt", Digest: "85944171f73967e8", Size: 6},
-	}
-	command := []string{"cc", "-c"}
-	key := ComputeKey(inputs, command)
-	m := &Manifest{
-		Version:  FormatVersion,
-		Producer: "cairn-rust",
-		Key:      key,
-		Command:  command,
-		Inputs:   inputs,
-		Outputs: []Entry{
-			{Path: "out/a.o", Digest: "cbf29ce484222325", Size: 0},
-		},
-	}
-	got := m.ToJSON()
+- **Rust engine (`cairn`)** — content-addressed store with hashing,
+  store/restore of output manifests, and integrity verification.
+  - `hash`, `key`, `store`, `restore`, `verify`, `show` subcommands.
+  - Standard-library-only implementation, including a small canonical JSON
+    reader/writer.
+- **Go wrapper (`cairn-run`)** — cache-aware command execution.
+  - Cache HIT restores declared outputs; MISS runs the command and captures
+    outputs. Failed commands are not cached.
+  - `hash` and `version` helper subcommands.
+- **Shared format v1** — FNV-1a 64-bit content hashing, canonical cache-key
+  stream, and canonical manifest JSON, documented in `docs/FORMAT.md` and
+  reproduced byte-for-byte by both tools.
+- Cross-language reference-vector tests guarding digest and key parity.
+- Demo scripts (`examples/demo.sh`, `examples/demo.ps1`), Makefile, and GitHub
+  Actions CI (Rust, Go, and an interop job running the demo).
 
-	// Parse it back and re-encode to confirm stability.
-	parsed, err := ParseManifest([]byte(got))
-	if err != nil {
-		t.Fatalf("ParseManifest failed: %v", err)
-	}
-	if again := parsed.ToJSON(); again != got {
-		t.Errorf("re-encoded JSON differs:\n first: %s\nsecond: %s", got, again)
-	}
-}
+### Notes
 
-func TestKeyStableAndCommandSensitive(t *testing.T) {
-	inputs := []Entry{{Path: "x", Digest: "af63dc4c8601ec8c", Size: 1}}
-	k1 := ComputeKey(inputs, []string{"go", "build"})
-	k2 := ComputeKey(inputs, []string{"go", "build"})
-	if k1 != k2 {
-		t.Errorf("key not stable: %s != %s", k1, k2)
-	}
-	k3 := ComputeKey(inputs, []string{"go", "test"})
-	if k1 == k3 {
-		t.Errorf("key should change with command")
-	}
-}
+- The hash is intentionally **non-cryptographic**; Cairn is a build cache, not
+  a security boundary. See `docs/FORMAT.md` for the rationale.
 
-func TestStoreRestoreVerify(t *testing.T) {
-	dir := t.TempDir()
-	work := filepath.Join(dir, "work")
-	if err := os.MkdirAll(work, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(work, "in.txt"), []byte("foobar"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(work, "out.txt"), []byte("result-bytes"), 0o644); err != nil {
-		t.Fatal(err)
-	}
+[0.1.0]: https://github.com/example/cairn/releases/tag/v0.1.0
 
-	store, err := OpenStore(filepath.Join(dir, "cache"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	inputs, err := HashInputs(work, []string{"in.txt"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	command := []string{"build"}
-	key := ComputeKey(inputs, command)
-	outputs, err := store.StoreOutputs(work, []string{"out.txt"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	m := &Manifest{
-		Version:  FormatVersion,
-		Producer: producerTag,
-		Key:      key,
-		Command:  command,
-		Inputs:   inputs,
-		Outputs:  outputs,
-	}
-	if err := store.PutManifest(m); err != nil {
-		t.Fatal(err)
-	}
-
-	// Remove output and restore it.
-	if err := os.Remove(filepath.Join(work, "out.txt")); err != nil {
-		t.Fatal(err)
+// draft note 909
