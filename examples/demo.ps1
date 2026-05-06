@@ -1,34 +1,51 @@
-# Changelog
+# Cairn end-to-end demo (Windows PowerShell).
+#
+# Mirrors examples/demo.sh: build both tools, then show hashing, a cache MISS
+# that runs a build, a cache HIT that skips it, and a cross-language check
+# where the Rust engine restores/verifies the Go-written manifest.
+$ErrorActionPreference = 'Stop'
 
-All notable changes to this project are documented here. The format is based
-on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
-adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+$here  = Split-Path -Parent $PSScriptRoot
+$cairn = Join-Path $here 'rust\target\release\cairn.exe'
+$run   = Join-Path $here 'bin\cairn-run.exe'
 
-## [0.1.0] - 2026-08-31
+Write-Host '==> Building Rust engine'
+Push-Location (Join-Path $here 'rust'); cargo build --release | Out-Null; Pop-Location
+Write-Host '==> Building Go wrapper'
+New-Item -ItemType Directory -Force -Path (Join-Path $here 'bin') | Out-Null
+Push-Location (Join-Path $here 'go'); go build -o $run ./cmd/cairn-run; Pop-Location
 
-### Added
+$work = Join-Path $env:TEMP ("cairn-demo-" + (Get-Random))
+New-Item -ItemType Directory -Path $work | Out-Null
+Push-Location $work
+try {
+    Write-Host "`n==> Create a source input"
+    Set-Content -Path input.txt -Value 'greetings from cairn' -NoNewline
+    & $cairn hash input.txt
 
-- **Rust engine (`cairn`)** — content-addressed store with hashing,
-  store/restore of output manifests, and integrity verification.
-  - `hash`, `key`, `store`, `restore`, `verify`, `show` subcommands.
-  - Standard-library-only implementation, including a small canonical JSON
-    reader/writer.
-- **Go wrapper (`cairn-run`)** — cache-aware command execution.
-  - Cache HIT restores declared outputs; MISS runs the command and captures
-    outputs. Failed commands are not cached.
-  - `hash` and `version` helper subcommands.
-- **Shared format v1** — FNV-1a 64-bit content hashing, canonical cache-key
-  stream, and canonical manifest JSON, documented in `docs/FORMAT.md` and
-  reproduced byte-for-byte by both tools.
-- Cross-language reference-vector tests guarding digest and key parity.
-- Demo scripts (`examples/demo.sh`, `examples/demo.ps1`), Makefile, and GitHub
-  Actions CI (Rust, Go, and an interop job running the demo).
+    Write-Host "`n==> First run (expect cache MISS, command executes)"
+    & $run --verbose --input input.txt --output output.txt -- powershell -NoProfile -Command "(Get-Content input.txt).ToUpper() | Set-Content output.txt -NoNewline"
+    Write-Host "output.txt: $(Get-Content output.txt)"
 
-### Notes
+    Write-Host "`n==> Delete output, run again (expect cache HIT, command skipped)"
+    Remove-Item output.txt
+    & $run --verbose --input input.txt --output output.txt -- powershell -NoProfile -Command "(Get-Content input.txt).ToUpper() | Set-Content output.txt -NoNewline"
+    Write-Host "output.txt restored: $(Get-Content output.txt)"
 
-- The hash is intentionally **non-cryptographic**; Cairn is a build cache, not
-  a security boundary. See `docs/FORMAT.md` for the rationale.
+    Write-Host "`n==> Cross-language: Rust computes the same key"
+    $key = & $cairn key --input input.txt -- powershell -NoProfile -Command "(Get-Content input.txt).ToUpper() | Set-Content output.txt -NoNewline"
+    Write-Host "key = $key"
 
-[0.1.0]: https://github.com/example/cairn/releases/tag/v0.1.0
+    Write-Host "`n==> Rust restores + verifies the Go-written manifest"
+    Remove-Item output.txt
+    & $cairn restore --key $key --out-dir .
+    & $cairn verify --key $key
+    Write-Host 'manifest:'
+    & $cairn show --key $key
 
-// draft note 964
+    Write-Host "`n==> Demo complete."
+}
+finally {
+    Pop-Location
+    Remove-Item -Recurse -Force $work
+}
