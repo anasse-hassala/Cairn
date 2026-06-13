@@ -1,34 +1,140 @@
-# Changelog
+# Cairn Cache Format (v1)
 
-All notable changes to this project are documented here. The format is based
-on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project
-adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This document is the normative specification of the Cairn on-disk format and
+hashing scheme. Both the Rust engine (`cairn`) and the Go wrapper (`cairn-run`)
+implement it exactly, so a cache produced by one tool is fully usable by the
+other.
 
-## [0.1.0] - 2026-08-31
+## 1. Content hashing
 
-### Added
+Cairn addresses content with the **64-bit FNV-1a** hash.
 
-- **Rust engine (`cairn`)** — content-addressed store with hashing,
-  store/restore of output manifests, and integrity verification.
-  - `hash`, `key`, `store`, `restore`, `verify`, `show` subcommands.
-  - Standard-library-only implementation, including a small canonical JSON
-    reader/writer.
-- **Go wrapper (`cairn-run`)** — cache-aware command execution.
-  - Cache HIT restores declared outputs; MISS runs the command and captures
-    outputs. Failed commands are not cached.
-  - `hash` and `version` helper subcommands.
-- **Shared format v1** — FNV-1a 64-bit content hashing, canonical cache-key
-  stream, and canonical manifest JSON, documented in `docs/FORMAT.md` and
-  reproduced byte-for-byte by both tools.
-- Cross-language reference-vector tests guarding digest and key parity.
-- Demo scripts (`examples/demo.sh`, `examples/demo.ps1`), Makefile, and GitHub
-  Actions CI (Rust, Go, and an interop job running the demo).
+```
+state = 0xcbf29ce484222325            (offset basis)
+for each byte b in input:
+    state = state XOR b
+    state = (state * 0x00000100000001b3) mod 2^64   (wrapping multiply)
+```
 
-### Notes
+The **canonical digest** is the final `state` rendered as a zero-padded,
+lowercase, 16-character hexadecimal string (`%016x`).
 
-- The hash is intentionally **non-cryptographic**; Cairn is a build cache, not
-  a security boundary. See `docs/FORMAT.md` for the rationale.
+### Reference vectors
 
-[0.1.0]: https://github.com/example/cairn/releases/tag/v0.1.0
+| Input      | Canonical digest     |
+| ---------- | -------------------- |
+| `""`       | `cbf29ce484222325`   |
+| `"a"`      | `af63dc4c8601ec8c`   |
+| `"foobar"` | `85944171f73967e8`   |
 
-// draft note 988
+Both implementations assert these vectors in their unit tests.
+
+### ⚠️ Non-cryptographic
+
+FNV-1a is **not** a cryptographic hash. It has no collision resistance or
+pre-image resistance against a deliberate attacker. Cairn is a build cache, not
+a security boundary. FNV-1a was chosen because it is:
+
+- **Deterministic** across platforms, architectures, and languages.
+- **Dependency-free** — expressible in a few lines in any language.
+- **Fast** and adequate for detecting *accidental* change (the actual job of a
+  build cache).
+
+Do not use Cairn digests to defend against malicious tampering. If you need
+that, layer a signed manifest or a cryptographic digest on top.
+
+## 2. Cache key
+
+A cache key identifies a logical build step. It is the FNV-1a canonical digest
+of the following byte stream, where `\x00` is a single NUL byte:
+
+```
+"cairn-key\x00"
+<format-version-decimal> "\x00"
+for each input entry, sorted ascending by path:
+    <path>   "\x00"
+    <digest> "\x00"
+    <size-decimal> "\x00"
+"cmd\x00"
+for each command argument, in order:
+    <arg> "\x00"
+```
+
+- `format-version-decimal` is the decimal ASCII of the format version (`1`).
+- Inputs **must** be sorted by `path` (byte-wise ascending) before hashing.
+- `path` uses forward slashes on all platforms.
+- `size-decimal` is the decimal ASCII of the byte length.
+
+Because the command participates in the key, changing the command (or any
+argument) yields a different key, so unrelated steps never collide.
+
+## 3. Manifest JSON
+
+A manifest is a single JSON object serialized **canonically**: compact (no
+insignificant whitespace) with keys in the fixed order below.
+
+```json
+{
+  "version": 1,
+  "producer": "cairn-go",
+  "key": "6021f3a455f5af1f",
+  "command": ["cc", "-c", "main.c", "-o", "main.o"],
+  "inputs": [
+    {"path": "main.c", "digest": "af63dc4c8601ec8c", "size": 123}
+  ],
+  "outputs": [
+    {"path": "main.o", "digest": "85944171f73967e8", "size": 456}
+  ]
+}
+```
+
+Field semantics:
+
+| Field      | Type              | Meaning                                              |
+| ---------- | ----------------- | ---------------------------------------------------- |
+| `version`  | unsigned integer  | Format version; currently `1`.                       |
+| `producer` | string            | Tool that wrote it: `cairn-rust` or `cairn-go`.      |
+| `key`      | string            | The cache key (§2).                                  |
+| `command`  | array of strings  | The command line (may be empty for pure hashing).    |
+| `inputs`   | array of entries  | Hashed inputs, sorted by `path`.                     |
+| `outputs`  | array of entries  | Captured outputs, sorted by `path`.                  |
+
+An **entry** is an object with keys `path` (string), `digest` (string), and
+`size` (unsigned integer), in that order.
+
+String escaping follows RFC 8259: `"`, `\`, `\n`, `\r`, `\t` use short escapes;
+other control characters (`< 0x20`) use lowercase `\uXXXX`.
+
+## 4. On-disk layout
+
+Relative to the cache root (default `.cairn-cache`):
+
+```
+<root>/
+  objects/<aa>/<digest>       content blob; <aa> = first two hex chars of digest
+  manifests/<key>.json        canonical manifest, one file per key
+```
+
+- Blobs are content-addressed and therefore automatically deduplicated: two
+  outputs with identical bytes share one blob.
+- Writes are atomic: content is written to a `.tmp` sibling and renamed into
+  place.
+
+## 5. Verification
+
+Verifying a key means:
+
+1. Every output blob referenced by the manifest exists.
+2. Each blob re-hashes to its recorded digest (detects accidental corruption).
+3. Recomputing the key (§2) from the manifest's inputs and command equals the
+   stored `key` (detects manifest tampering with the index).
+
+A cache is *healthy* for a key when all three hold.
+
+## 6. Compatibility guarantees
+
+- The two implementations produce **byte-identical** manifests for the same
+  logical entry.
+- Either tool can restore and verify a manifest written by the other.
+- New format versions bump `version`; readers should reject versions they do
+  not understand.
