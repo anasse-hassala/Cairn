@@ -30,5 +30,3 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   a security boundary. See `docs/FORMAT.md` for the rationale.
 
 [0.1.0]: https://github.com/example/cairn/releases/tag/v0.1.0
-
-// draft note 1001
