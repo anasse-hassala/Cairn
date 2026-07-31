@@ -49,4 +49,4 @@ clean: ## Remove build artifacts and caches
 	cd rust && cargo clean
 	rm -rf bin .cairn-cache
 
-// draft note 1009
+// draft note 1010
